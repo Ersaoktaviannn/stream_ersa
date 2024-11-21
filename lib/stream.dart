@@ -33,4 +33,11 @@ class NumberStream {
     controller.sink.add(newNumber);
   }
 
-  Langkah 5: Tambah method close()
+  void addError() {
+    controller.sink.addError('error');
+  }
+
+  void close() {
+    controller.close();
+  }
+}
