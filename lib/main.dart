@@ -32,6 +32,8 @@ class _StreamHomePageState extends State<StreamHomePage> {
   late StreamController numberStreamController;
   late NumberStream numberStream;
   late StreamSubscription subscription;
+  late StreamSubscription subscription2;
+  String values = '';
 
   @override
   void initState() {
@@ -40,10 +42,20 @@ class _StreamHomePageState extends State<StreamHomePage> {
     numberStream = NumberStream();
     numberStreamController = numberStream.controller;
 
-    Stream stream = numberStreamController.stream;
+    // Menggunakan asBroadcastStream agar bisa memiliki lebih dari satu listener
+    Stream stream = numberStreamController.stream.asBroadcastStream();
+
+    // Mendengarkan stream untuk subscription pertama
     subscription = stream.listen((event) {
       setState(() {
-        lastNumber = event;
+        lastNumber = event; // Menampilkan angka terbaru
+      });
+    });
+
+    // Mendengarkan stream untuk subscription kedua
+    subscription2 = stream.listen((event) {
+      setState(() {
+        values += '$event - '; // Menampilkan hasil yang bertambah
       });
     });
 
@@ -61,11 +73,12 @@ class _StreamHomePageState extends State<StreamHomePage> {
   @override
   void dispose() {
     subscription.cancel();
+    subscription2.cancel();
     super.dispose();
   }
 
   void stopStream() {
-    numberStreamController.close();
+    numberStreamController.close(); // Menutup stream
   }
 
   void addRandomNumber() {
@@ -75,7 +88,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
       numberStream.addNumberToSink(myNum);
     } else {
       setState(() {
-        lastNumber = -1;
+        lastNumber = -1; // Jika stream ditutup, tampilkan -1
       });
     }
   }
@@ -90,9 +103,15 @@ class _StreamHomePageState extends State<StreamHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Menampilkan angka terbaru yang diterima oleh stream
             Text(
               lastNumber.toString(),
               style: const TextStyle(fontSize: 48),
+            ),
+            // Menampilkan rangkaian angka yang diterima oleh listener kedua
+            Text(
+              values,
+              style: const TextStyle(fontSize: 24),
             ),
             ElevatedButton(
               onPressed: () => addRandomNumber(),
