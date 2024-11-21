@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class ColorStream {
@@ -24,3 +25,12 @@ class ColorStream {
     );
   }
 }
+
+class NumberStream {
+  final StreamController<int> controller = StreamController<int>();
+
+  void addNumberToSink(int newNumber) {
+    controller.sink.add(newNumber);
+  }
+
+  Langkah 5: Tambah method close()
